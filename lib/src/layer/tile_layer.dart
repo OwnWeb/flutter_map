@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_image/network.dart';
 import 'package:flutter_map/src/core/bounds.dart';
 import 'package:flutter_map/src/core/point.dart';
 import 'package:flutter_map/src/core/util.dart' as util;
@@ -524,6 +525,11 @@ class _TileLayerState extends State<TileLayer> with TickerProviderStateMixin {
 
     for (var key in toRemove) {
       var tile = _tiles[key];
+
+      if (tile.imageProvider is NetworkImageWithRetry) {
+        NetworkImageWithRetry imageProvider = tile.imageProvider;
+        imageProvider.abort('');
+      }
 
       tile.tileReady = null;
       tile.dispose();
@@ -1056,6 +1062,7 @@ class Tile implements Comparable<Tile> {
   DateTime loaded;
 
   AnimationController animationController;
+
   double get opacity => animationController == null
       ? (active ? 1.0 : 0.0)
       : animationController.value;
